@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR Görüntüleri ve Genetik Rapor</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 950px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 6px;
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 40%;
+            transition: width 0.3s;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #1e3c72;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .required {
+            color: #f44336;
+            margin-left: 4px;
+        }
+
+        .upload-group {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px dashed #e0e0e0;
+            border-radius: 12px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .upload-group:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .upload-group.uploaded {
+            border-color: #4caf50;
+            background: #f1f8f4;
+            border-style: solid;
+        }
+
+        .upload-group.error {
+            border-color: #f44336;
+            background: #fff5f5;
+        }
+
+        .upload-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .upload-header h3 {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .file-label .icon {
+            font-size: 24px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .upload-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            color: #ff5252;
+        }
+
+        .status-success {
+            color: #4caf50;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 13px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .optional-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #fff8e1;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+        }
+
+        .optional-section h3 {
+            font-size: 16px;
+            color: #f57c00;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .optional-section p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .genetic-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 4px solid #4caf50;
+            border-radius: 8px;
+        }
+
+        .genetic-section h3 {
+            font-size: 18px;
+            color: #2e7d32;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .genetic-section p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e0e0e0;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .upload-group {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🧠</span>
+                Glioblastom TMZ Yanıt Tahmin Sistemi
+            </h1>
+            <p>Adım 2/5: MR Görüntüleri ve Genetik Rapor Yükleme</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section-title">
+                🖼️ MR GÖRÜNTÜLERİNİ YÜKLEYİN
+            </div>
+
+            <form id="uploadForm">
+                <!-- T1 -->
+                <div class="upload-group" id="t1-upload">
+                    <div class="upload-header">
+                        <span style="font-size: 24px;">📁</span>
+                        <h3>T1-Weighted Görüntüsü <span class="required">*</span></h3>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" id="t1-file" accept=".nii,.nii.gz" required>
+                        <label for="t1-file" class="file-label">
+                            <span class="icon">📤</span>
+                            <div class="file-info">
+                                <div style="font-weight: 600;">Dosya Seç</div>
+                                <div class="file-name">T1.nii.gz</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="upload-status status-pending">
+                        ❌ Durum: Yüklenmedi
+                    </div>
+                    <div class="error-message">T1 görüntüsü zorunludur</div>
+                </div>
+
+                <!-- T1c -->
+                <div class="upload-group" id="t1c-upload">
+                    <div class="upload-header">
+                        <span style="font-size: 24px;">📁</span>
+                        <h3>T1-Contrast Enhanced Görüntüsü <span class="required">*</span></h3>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" id="t1c-file" accept=".nii,.nii.gz" required>
+                        <label for="t1c-file" class="file-label">
+                            <span class="icon">📤</span>
+                            <div class="file-info">
+                                <div style="font-weight: 600;">Dosya Seç</div>
+                                <div class="file-name">T1c.nii.gz</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="upload-status status-pending">
+                        ❌ Durum: Yüklenmedi
+                    </div>
+                    <div class="error-message">T1c görüntüsü zorunludur</div>
+                </div>
+
+                <!-- T2 -->
+                <div class="upload-group" id="t2-upload">
+                    <div class="upload-header">
+                        <span style="font-size: 24px;">📁</span>
+                        <h3>T2-Weighted Görüntüsü <span class="required">*</span></h3>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" id="t2-file" accept=".nii,.nii.gz" required>
+                        <label for="t2-file" class="file-label">
+                            <span class="icon">📤</span>
+                            <div class="file-info">
+                                <div style="font-weight: 600;">Dosya Seç</div>
+                                <div class="file-name">T2.nii.gz</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="upload-status status-pending">
+                        ❌ Durum: Yüklenmedi
+                    </div>
+                    <div class="error-message">T2 görüntüsü zorunludur</div>
+                </div>
+
+                <!-- FLAIR -->
+                <div class="upload-group" id="flair-upload">
+                    <div class="upload-header">
+                        <span style="font-size: 24px;">📁</span>
+                        <h3>FLAIR Görüntüsü <span class="required">*</span></h3>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" id="flair-file" accept=".nii,.nii.gz" required>
+                        <label for="flair-file" class="file-label">
+                            <span class="icon">📤</span>
+                            <div class="file-info">
+                                <div style="font-weight: 600;">Dosya Seç</div>
+                                <div class="file-name">FLAIR.nii.gz</div>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="upload-status status-pending">
+                        ❌ Durum: Yüklenmedi
+                    </div>
+                    <div class="error-message">FLAIR görüntüsü zorunludur</div>
+                </div>
+
+                <!-- Genetik Rapor (ZORUNLU) -->
+                <div class="genetic-section">
+                    <h3>🧬 Genetik Analiz Raporu <span class="required">*</span></h3>
+                    <p>
+                        <strong>Zorunlu:</strong> Hastanın genetik analiz raporunu (MGMT, IDH, 1p/19q sonuçlarını
+                        içeren) PDF veya DOCX formatında yükleyiniz.
+                        Bu rapor moleküler profil değerlendirmesi için kritik öneme sahiptir.
+                    </p>
+                    <div class="upload-group" id="genetic-upload">
+                        <div class="file-input-wrapper">
+                            <input type="file" class="file-input" id="genetic-file" accept=".pdf,.doc,.docx" required>
+                            <label for="genetic-file" class="file-label">
+                                <span class="icon">📄</span>
+                                <div class="file-info">
+                                    <div style="font-weight: 600;">Genetik Rapor Seç (PDF/DOCX)</div>
+                                    <div class="file-name">genetic_report.pdf</div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="upload-status status-pending">
+                            ❌ Durum: Yüklenmedi
+                        </div>
+                        <div class="error-message">Genetik rapor zorunludur</div>
+                    </div>
+                </div>
+
+                <!-- Segmentasyon (Opsiyonel) -->
+                <div class="optional-section">
+                    <h3>💡 Opsiyonel: Segmentasyon Maskesi</h3>
+                    <p>
+                        Segmentasyon maskesi yüklemek opsiyoneldir. Yüklemezseniz sistem otomatik olarak U-Net ile
+                        oluşturacaktır (~28 saniye sürer).
+                    </p>
+                    <div class="upload-group" id="seg-upload">
+                        <div class="file-input-wrapper">
+                            <input type="file" class="file-input" id="seg-file" accept=".nii,.nii.gz">
+                            <label for="seg-file" class="file-label">
+                                <span class="icon">📤</span>
+                                <div class="file-info">
+                                    <div style="font-weight: 600;">Dosya Seç (Opsiyonel)</div>
+                                    <div class="file-name">segmentation.nii.gz</div>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="upload-status" style="color: #999;">
+                            ⚪ Opsiyonel
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='sayfa1.html'">
+                        <span>←</span>
+                        Geri
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        İleri
+                        <span>→</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="progress-indicator">
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dosya yükleme durumlarını takip et
+        const uploadStates = {
+            t1: false,
+            t1c: false,
+            t2: false,
+            flair: false,
+            genetic: false,
+            seg: false
+        };
+
+        // Dosya yükleme event'leri
+        document.querySelectorAll('.file-input').forEach(input => {
+            input.addEventListener('change', function (e) {
+                const uploadGroup = this.closest('.upload-group');
+                const statusDiv = uploadGroup.querySelector('.upload-status');
+                const errorDiv = uploadGroup.querySelector('.error-message');
+
+                if (this.files.length > 0) {
+                    const fileName = this.files[0].name;
+                    const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2); // MB
+
+                    uploadGroup.classList.add('uploaded');
+                    uploadGroup.classList.remove('error');
+                    statusDiv.className = 'upload-status status-success';
+                    statusDiv.innerHTML = `✅ Yüklendi: ${fileName} (${fileSize} MB)`;
+
+                    if (errorDiv) {
+                        errorDiv.classList.remove('show');
+                    }
+
+                    // Durumu güncelle
+                    const fileId = this.id.replace('-file', '');
+                    if (fileId === 't1') uploadStates.t1 = true;
+                    else if (fileId === 't1c') uploadStates.t1c = true;
+                    else if (fileId === 't2') uploadStates.t2 = true;
+                    else if (fileId === 'flair') uploadStates.flair = true;
+                    else if (fileId === 'genetic') uploadStates.genetic = true;
+                    else if (fileId === 'seg') uploadStates.seg = true;
+                }
+            });
+        });
+
+        // Form gönderimi
+        document.getElementById('uploadForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let isValid = true;
+            const requiredFiles = ['t1', 't1c', 't2', 'flair', 'genetic'];
+
+            // Tüm zorunlu dosyaları kontrol et
+            requiredFiles.forEach(fileId => {
+                const input = document.getElementById(fileId + '-file');
+                const uploadGroup = document.getElementById(fileId + '-upload');
+                const errorDiv = uploadGroup.querySelector('.error-message');
+
+                if (!input.files || input.files.length === 0) {
+                    uploadGroup.classList.add('error');
+                    if (errorDiv) {
+                        errorDiv.classList.add('show');
+                    }
+                    isValid = false;
+                } else {
+                    uploadGroup.classList.remove('error');
+                    if (errorDiv) {
+                        errorDiv.classList.remove('show');
+                    }
+                }
+            });
+
+            if (isValid) {
+                // Dosya bilgilerini kaydet
+                const uploadData = {
+                    t1: document.getElementById('t1-file').files[0]?.name || '',
+                    t1c: document.getElementById('t1c-file').files[0]?.name || '',
+                    t2: document.getElementById('t2-file').files[0]?.name || '',
+                    flair: document.getElementById('flair-file').files[0]?.name || '',
+                    genetic: document.getElementById('genetic-file').files[0]?.name || '',
+                    seg: document.getElementById('seg-file').files[0]?.name || 'Otomatik oluşturulacak',
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('uploadData', JSON.stringify(uploadData));
+                window.location.href = 'sayfa3.html';
+            } else {
+                // İlk hatalı alana scroll
+                const firstError = document.querySelector('.upload-group.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                alert('Lütfen tüm zorunlu dosyaları yükleyiniz:\n- T1 görüntüsü\n- T1c görüntüsü\n- T2 görüntüsü\n- FLAIR görüntüsü\n- Genetik Rapor (PDF/DOCX)');
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut verileri kontrol et
+        window.onload = () => {
+            const data = JSON.parse(localStorage.getItem('uploadData') || '{}');
+            // Önceki yüklemeler varsa göster (simülasyon için)
+            if (data.t1) {
+                console.log('Önceki yükleme verileri bulundu:', data);
+            }
+        };
+    </script>
+</body>
+
+</html>

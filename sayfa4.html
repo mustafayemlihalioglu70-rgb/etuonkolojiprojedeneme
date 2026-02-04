@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analiz Süreci</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .content {
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .ai-icon {
+            font-size: 80px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .analysis-title {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 40px;
+            font-weight: 600;
+        }
+
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-bar-wrapper {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .progress-percentage {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .steps-container {
+            text-align: left;
+            margin: 40px 0;
+            padding: 30px;
+            background: #f8f9ff;
+            border-radius: 12px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+            font-size: 16px;
+        }
+
+        .step-icon {
+            font-size: 24px;
+            width: 30px;
+        }
+
+        .step.completed {
+            color: #4caf50;
+        }
+
+        .step.processing {
+            color: #667eea;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .step.pending {
+            color: #999;
+        }
+
+        .time-remaining {
+            font-size: 18px;
+            color: #666;
+            margin-top: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            border: 2px dashed #667eea;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Glioblastom TMZ Yanıt Tahmin Sistemi</h1>
+        </div>
+
+        <div class="content">
+            <div class="ai-icon">⏳</div>
+            <div class="analysis-title">Yapay Zeka Analiz Yapıyor...</div>
+
+            <div class="progress-container">
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" id="progressBar">
+                        <span id="progressText">0%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="steps-container">
+                <div class="step completed" id="step1">
+                    <span class="step-icon">✅</span>
+                    <span>MR görüntüleri yüklendi</span>
+                </div>
+                <div class="step completed" id="step2">
+                    <span class="step-icon">✅</span>
+                    <span>Ön işleme tamamlandı</span>
+                </div>
+                <div class="step completed" id="step3">
+                    <span class="step-icon">✅</span>
+                    <span>Segmentasyon oluşturuldu (28 sn)</span>
+                </div>
+                <div class="step processing" id="step4">
+                    <span class="step-icon">⏳</span>
+                    <span>Radiomics özellikleri çıkarılıyor...</span>
+                </div>
+                <div class="step processing" id="step5">
+                    <span class="step-icon">⏳</span>
+                    <span>Derin öğrenme analizi yapılıyor...</span>
+                </div>
+                <div class="step pending" id="step6">
+                    <span class="step-icon">⏺️</span>
+                    <span>Tahmin modeli çalışıyor...</span>
+                </div>
+            </div>
+
+            <div class="time-remaining">
+                <div class="spinner"></div>
+                <strong>Tahmini kalan süre:</strong> <span id="timeRemaining">12</span> saniye
+            </div>
+
+            <div class="progress-indicator">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let progress = 0;
+        let timeLeft = 12;
+
+        function updateProgress() {
+            progress += 2;
+            if (progress > 100) progress = 100;
+
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = progress + '%';
+
+            // Update steps
+            if (progress >= 80) {
+                document.getElementById('step4').className = 'step completed';
+                document.getElementById('step5').className = 'step completed';
+                document.getElementById('step6').className = 'step processing';
+            }
+
+            // Update time
+            timeLeft = Math.max(0, Math.round((100 - progress) * 0.12));
+            document.getElementById('timeRemaining').textContent = timeLeft;
+
+            if (progress >= 100) {
+                setTimeout(() => {
+                    window.location.href = 'sayfa5.html';
+                }, 1000);
+            } else {
+                setTimeout(updateProgress, 200);
+            }
+        }
+
+        // Start animation after page load
+        setTimeout(() => {
+            progress = 75; // Start from 75%
+            document.getElementById('progressBar').style.width = '75%';
+            document.getElementById('progressText').textContent = '75%';
+            updateProgress();
+        }, 500);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moleküler ve Klinik Test Sonuçları</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 950px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 6px;
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 60%;
+            transition: width 0.3s;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #1e3c72;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .required {
+            color: #f44336;
+            margin-left: 4px;
+        }
+
+        .test-group {
+            margin-bottom: 30px;
+            padding: 25px;
+            background: #f8f9ff;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .test-group.error {
+            border-left-color: #f44336;
+            background: #fff5f5;
+        }
+
+        .test-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .test-number {
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .test-header h3 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-left: 55px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .option-description {
+            font-size: 13px;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .input-group {
+            margin-left: 55px;
+        }
+
+        .input-group input {
+            width: 100%;
+            max-width: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-group input.error {
+            border-color: #f44336;
+        }
+
+        .input-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 8px;
+            margin-left: 55px;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 13px;
+            margin-top: 10px;
+            margin-left: 55px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            font-size: 18px;
+            padding: 18px 40px;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(76, 175, 80, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .test-group {
+                padding: 20px;
+            }
+
+            .radio-options,
+            .input-group,
+            .input-hint,
+            .error-message {
+                margin-left: 0;
+            }
+
+            .test-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .test-group {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🧠</span>
+                Glioblastom TMZ Yanıt Tahmin Sistemi
+            </h1>
+            <p>Adım 3/5: Moleküler ve Klinik Test Sonuçları</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section-title">
+                🧬 MOLEKÜLER VE KLİNİK TEST SONUÇLARI
+            </div>
+
+            <form id="testForm">
+                <!-- MGMT Test -->
+                <div class="test-group" id="mgmt-group">
+                    <div class="test-header">
+                        <div class="test-number">1</div>
+                        <h3>MGMT Promoter Metilasyon Durumu <span class="required">*</span></h3>
+                    </div>
+                    <div class="radio-options">
+                        <div class="radio-option">
+                            <input type="radio" id="mgmt1" name="mgmt" value="Metile" required>
+                            <label for="mgmt1">
+                                <div>Metile</div>
+                                <div class="option-description">TMZ'ye daha iyi yanıt beklenir</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="mgmt2" name="mgmt" value="Metile Değil">
+                            <label for="mgmt2">
+                                <div>Metile Değil</div>
+                                <div class="option-description">TMZ direnci olasılığı yüksek</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="mgmt3" name="mgmt" value="Bilinmiyor">
+                            <label for="mgmt3">
+                                <div>Bilinmiyor</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="mgmt-error">Lütfen MGMT durumunu seçiniz</div>
+                </div>
+
+                <!-- IDH Test -->
+                <div class="test-group" id="idh-group">
+                    <div class="test-header">
+                        <div class="test-number">2</div>
+                        <h3>IDH Mutasyon Durumu <span class="required">*</span></h3>
+                    </div>
+                    <div class="radio-options">
+                        <div class="radio-option">
+                            <input type="radio" id="idh1" name="idh" value="Mutant" required>
+                            <label for="idh1">
+                                <div>Mutant (IDH1/IDH2)</div>
+                                <div class="option-description">Sekonder GBM, daha iyi prognoz</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="idh2" name="idh" value="Wildtype">
+                            <label for="idh2">
+                                <div>Wildtype</div>
+                                <div class="option-description">Primer GBM, agresif seyir</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="idh3" name="idh" value="Bilinmiyor">
+                            <label for="idh3">
+                                <div>Bilinmiyor</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="idh-error">Lütfen IDH durumunu seçiniz</div>
+                </div>
+
+                <!-- 1p/19q Test (Opsiyonel) -->
+                <div class="test-group">
+                    <div class="test-header">
+                        <div class="test-number">3</div>
+                        <h3>1p/19q Ko-delesyon (Opsiyonel)</h3>
+                    </div>
+                    <div class="radio-options">
+                        <div class="radio-option">
+                            <input type="radio" id="codeletion1" name="codeletion" value="Var">
+                            <label for="codeletion1">
+                                <div>Ko-delesyon Var</div>
+                                <div class="option-description">Oligodendroglial komponent</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="codeletion2" name="codeletion" value="Yok">
+                            <label for="codeletion2">
+                                <div>Ko-delesyon Yok</div>
+                            </label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="codeletion3" name="codeletion" value="Bilinmiyor" checked>
+                            <label for="codeletion3">
+                                <div>Bilinmiyor / Test Yapılmadı</div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPS Score -->
+                <div class="test-group" id="kps-group">
+                    <div class="test-header">
+                        <div class="test-number">4</div>
+                        <h3>Karnofsky Performans Skoru (KPS) <span class="required">*</span></h3>
+                    </div>
+                    <div class="input-group">
+                        <input type="number" id="kps" min="0" max="100" step="10" placeholder="Örn: 80" required>
+                    </div>
+                    <div class="input-hint">0-100 arası değer giriniz (10'un katları önerilir: 70, 80, 90...)</div>
+                    <div class="error-message" id="kps-error">Lütfen 0-100 arası geçerli bir KPS skoru giriniz</div>
+                </div>
+
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='sayfa2.html'">
+                        <span>←</span>
+                        Geri
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        Analizi Başlat
+                        <span>🚀</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="progress-indicator">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form validasyonu
+        document.getElementById('testForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let isValid = true;
+
+            // MGMT kontrolü
+            const mgmt = document.querySelector('input[name="mgmt"]:checked');
+            const mgmtGroup = document.getElementById('mgmt-group');
+            const mgmtError = document.getElementById('mgmt-error');
+
+            if (!mgmt) {
+                mgmtGroup.classList.add('error');
+                mgmtError.classList.add('show');
+                isValid = false;
+            } else {
+                mgmtGroup.classList.remove('error');
+                mgmtError.classList.remove('show');
+            }
+
+            // IDH kontrolü
+            const idh = document.querySelector('input[name="idh"]:checked');
+            const idhGroup = document.getElementById('idh-group');
+            const idhError = document.getElementById('idh-error');
+
+            if (!idh) {
+                idhGroup.classList.add('error');
+                idhError.classList.add('show');
+                isValid = false;
+            } else {
+                idhGroup.classList.remove('error');
+                idhError.classList.remove('show');
+            }
+
+            // KPS kontrolü
+            const kps = document.getElementById('kps');
+            const kpsValue = parseInt(kps.value);
+            const kpsGroup = document.getElementById('kps-group');
+            const kpsError = document.getElementById('kps-error');
+
+            if (!kpsValue || kpsValue < 0 || kpsValue > 100) {
+                kps.classList.add('error');
+                kpsGroup.classList.add('error');
+                kpsError.classList.add('show');
+                isValid = false;
+            } else {
+                kps.classList.remove('error');
+                kpsGroup.classList.remove('error');
+                kpsError.classList.remove('show');
+            }
+
+            // Tüm alanlar geçerliyse kaydet ve ilerle
+            if (isValid) {
+                const codeletion = document.querySelector('input[name="codeletion"]:checked');
+
+                const testData = {
+                    mgmt: mgmt.value,
+                    idh: idh.value,
+                    codeletion: codeletion ? codeletion.value : 'Bilinmiyor',
+                    kps: kpsValue,
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('testData', JSON.stringify(testData));
+                window.location.href = 'sayfa4.html';
+            } else {
+                // İlk hatalı alana scroll
+                const firstError = document.querySelector('.test-group.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                alert('Lütfen tüm zorunlu alanları doldurunuz:\n- MGMT durumu\n- IDH durumu\n- KPS skoru');
+            }
+        });
+
+        // Gerçek zamanlı hata temizleme
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function () {
+                const group = this.closest('.test-group');
+                if (group) {
+                    group.classList.remove('error');
+                    const errorMsg = group.querySelector('.error-message');
+                    if (errorMsg) {
+                        errorMsg.classList.remove('show');
+                    }
+                }
+            });
+        });
+
+        document.getElementById('kps').addEventListener('input', function () {
+            const kpsValue = parseInt(this.value);
+            if (kpsValue >= 0 && kpsValue <= 100) {
+                this.classList.remove('error');
+                document.getElementById('kps-group').classList.remove('error');
+                document.getElementById('kps-error').classList.remove('show');
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut verileri doldur
+        window.onload = () => {
+            const data = JSON.parse(localStorage.getItem('testData') || '{}');
+
+            if (data.mgmt) {
+                const mgmtRadio = document.querySelector(`input[name="mgmt"][value="${data.mgmt}"]`);
+                if (mgmtRadio) mgmtRadio.checked = true;
+            }
+
+            if (data.idh) {
+                const idhRadio = document.querySelector(`input[name="idh"][value="${data.idh}"]`);
+                if (idhRadio) idhRadio.checked = true;
+            }
+
+            if (data.codeletion) {
+                const codeletionRadio = document.querySelector(`input[name="codeletion"][value="${data.codeletion}"]`);
+                if (codeletionRadio) codeletionRadio.checked = true;
+            }
+
+            if (data.kps) {
+                document.getElementById('kps').value = data.kps;
+            }
+        };
+    </script>
+</body>
+
+</html>

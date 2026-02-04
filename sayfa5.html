@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analiz Sonuçları ve Klinik Öneriler</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .result-card {
+            margin-bottom: 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 600;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .response-card {
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe0e0 100%);
+            border-left: 5px solid #f44336;
+        }
+
+        .risk-badge {
+            background: #f44336;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .probability-section {
+            margin: 20px 0;
+        }
+
+        .probability-value {
+            font-size: 42px;
+            font-weight: bold;
+            color: #f44336;
+            margin: 15px 0;
+        }
+
+        .progress-visual {
+            width: 100%;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f44336 0%, #e91e63 100%);
+            width: 34.7%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .warning-box strong {
+            color: #f44336;
+            font-size: 16px;
+        }
+
+        .confidence {
+            color: #666;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .survival-card {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            border-left: 5px solid #ff9800;
+        }
+
+        .survival-stats {
+            margin-top: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .molecular-card {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-left: 5px solid #4caf50;
+        }
+
+        .molecular-item {
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .molecular-header {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .molecular-detail {
+            color: #666;
+            margin: 5px 0;
+            padding-left: 25px;
+        }
+
+        .recommendations-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196f3;
+        }
+
+        .strategy {
+            margin: 25px 0;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .strategy-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2196f3;
+            margin-bottom: 15px;
+        }
+
+        .strategy-number {
+            background: #2196f3;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .strategy-item {
+            padding: 8px 0;
+            padding-left: 25px;
+            color: #555;
+        }
+
+        .strategy-link {
+            color: #2196f3;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 10px;
+            padding-left: 25px;
+        }
+
+        .legal-notice {
+            background: #f5f5f5;
+            border: 2px solid #ff9800;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+
+        .legal-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff9800;
+            margin-bottom: 15px;
+        }
+
+        .legal-text {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-download {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-email {
+            background: #2196f3;
+            color: white;
+        }
+
+        .btn-email:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+        }
+
+        .btn-home {
+            background: #757575;
+            color: white;
+        }
+
+        .btn-home:hover {
+            background: #616161;
+            transform: translateY(-2px);
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+                flex-direction: column;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .result-card {
+                padding: 20px;
+            }
+
+            .card-header {
+                font-size: 18px;
+                flex-wrap: wrap;
+            }
+
+            .probability-value {
+                font-size: 36px;
+            }
+
+            .molecular-item,
+            .strategy {
+                padding: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .strategy-header {
+                font-size: 16px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .result-card {
+                padding: 15px;
+            }
+
+            .card-header {
+                font-size: 16px;
+            }
+
+            .probability-value {
+                font-size: 32px;
+            }
+
+            .progress-visual {
+                height: 30px;
+            }
+
+            .molecular-header,
+            .strategy-header {
+                font-size: 15px;
+            }
+
+            .legal-notice {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>📊</span>
+                ANALİZ SONUÇLARI VE KLİNİK ÖNERİLER
+            </h1>
+        </div>
+
+        <div class="content">
+            <!-- TMZ Response Prediction -->
+            <div class="result-card response-card">
+                <div class="card-header">
+                    🎯 TEMOZOLOMID YANIT TAHMİNİ
+                </div>
+                <div class="probability-section">
+                    <div>Yanıt Olasılığı:</div>
+                    <div class="probability-value">34.7%</div>
+                    <div class="progress-visual">
+                        <div class="progress-fill">Düşük</div>
+                    </div>
+                </div>
+                <div class="warning-box">
+                    <strong>🔴 YÜKSEK RİSK:</strong> Bu hasta TMZ tedavisine yeterli yanıt vermeyebilir
+                    <div class="confidence">(Güven: %87.3)</div>
+                </div>
+            </div>
+
+            <!-- Survival Risk Classification -->
+            <div class="result-card survival-card">
+                <div class="card-header">
+                    📈 SAĞKALIM RİSK SINIFLAMASI
+                </div>
+                <div class="risk-badge">Risk Seviyesi: YÜKSEK 🔴</div>
+                <div class="survival-stats">
+                    <div style="font-weight: 600; margin-bottom: 15px; font-size: 18px;">Tahmini Sağkalım:</div>
+                    <div class="stat-item">
+                        • Düşük risk hastalarla karşılaştırma: <strong>%45 daha kısa</strong>
+                    </div>
+                    <div class="stat-item">
+                        • Medyan sağkalım aralığı: <strong>8-12 ay</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Molecular Profile -->
+            <div class="result-card molecular-card">
+                <div class="card-header">
+                    🧬 MOLEKÜLER PROFİL DEĞERLENDİRMESİ
+                </div>
+                <div class="molecular-item">
+                    <div class="molecular-header">MGMT: Metile Değil ❌</div>
+                    <div class="molecular-detail">→ DNA onarım mekanizması aktif</div>
+                    <div class="molecular-detail">→ TMZ kemoterapisi daha az etkili olabilir</div>
+                </div>
+                <div class="molecular-item">
+                    <div class="molecular-header">IDH: Wildtype ⚠️</div>
+                    <div class="molecular-detail">→ Primer glioblastom</div>
+                    <div class="molecular-detail">→ Daha agresif seyir beklenir</div>
+                </div>
+            </div>
+
+            <!-- Clinical Recommendations -->
+            <div class="result-card recommendations-card">
+                <div class="card-header">
+                    🏥 KLİNİK ÖNERİLER VE YÖNLENDİRME
+                </div>
+
+                <div class="warning-box" style="background: #ffebee; border-left-color: #f44336;">
+                    <strong>⚠️ ERKEN DÖNEM TESPİT:</strong> Bu hasta standart TMZ tedavisinden yeterli fayda
+                    görmeyebilir.
+                </div>
+
+                <div style="margin-top: 25px; font-size: 18px; font-weight: 600; color: #2196f3;">
+                    ✅ ÖNERİLEN STRATEJİLER:
+                </div>
+
+                <div class="strategy">
+                    <div class="strategy-header">
+                        <div class="strategy-number">1</div>
+                        <span>🔬 ALTERNATİF TEDAVİLER</span>
+                    </div>
+                    <div class="strategy-item">• İmmünoterapi (Checkpoint inhibitörleri)</div>
+                    <div class="strategy-item">• Targeted therapy (EGFR inhibitörleri)</div>
+                    <div class="strategy-item">• Kombinasyon kemoterapisi (TMZ + Bevacizumab)</div>
+                </div>
+
+                <div class="strategy">
+                    <div class="strategy-header">
+                        <div class="strategy-number">2</div>
+                        <span>🧪 KLİNİK ARAŞTIRMALAR</span>
+                    </div>
+                    <div class="strategy-item">• Deneysel tedavi protokollerine uygun</div>
+                    <div class="strategy-item">• Phase II/III trial'lara yönlendirme</div>
+                    <a href="#" class="strategy-link">→ Yakındaki Klinik Çalışmaları Gör</a>
+                </div>
+
+                <div class="strategy">
+                    <div class="strategy-header">
+                        <div class="strategy-number">3</div>
+                        <span>📅 YAKIN TAKİP PROTOKOLÜ</span>
+                    </div>
+                    <div class="strategy-item">• Aylık MR kontrolleri (standart 3 ay yerine)</div>
+                    <div class="strategy-item">• Erken progresyon tespiti</div>
+                    <div class="strategy-item">• Tedavi değişikliği için hazırlık</div>
+                </div>
+
+                <div class="strategy">
+                    <div class="strategy-header">
+                        <div class="strategy-number">4</div>
+                        <span>🔄 MULTİDİSİPLİNER DEĞERLENDİRME</span>
+                    </div>
+                    <div class="strategy-item">• Nöro-onkoloji konseyi toplantısına sevk</div>
+                    <div class="strategy-item">• Radyasyon onkolojisi konsültasyonu</div>
+                    <div class="strategy-item">• Tıbbi onkoloji 2. görüş</div>
+                </div>
+            </div>
+
+            <!-- Legal Notice -->
+            <div class="legal-notice">
+                <div class="legal-header">
+                    ⚠️ YASAL UYARI
+                </div>
+                <div class="legal-text">
+                    Bu sistem bir <strong>KLİNİK KARAR DESTEK ARACI</strong>'dır. Kesin tanı ve tedavi kararları mutlaka
+                    uzman hekimler tarafından verilmelidir. Bu rapor hekim kararının yerini tutmaz.
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-download" onclick="alert('PDF raporu indiriliyor...')">
+                    📄 Raporu İndir (PDF)
+                </button>
+                <button class="btn btn-email" onclick="alert('Email gönderiliyor...')">
+                    📧 Email Gönder
+                </button>
+                <button class="btn btn-home" onclick="window.location.href='sayfa1.html'">
+                    🏠 Ana Sayfa
+                </button>
+            </div>
+
+            <div class="progress-indicator">
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot active"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teknik Mimari - Sistem Yapısı</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .content {
+            padding: 50px;
+        }
+
+        .architecture-diagram {
+            margin: 30px 0;
+        }
+
+        .layer {
+            margin-bottom: 30px;
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .layer-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .layer-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .layer-content {
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .layer-item {
+            padding: 10px 0;
+            padding-left: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .arrow-down {
+            text-align: center;
+            font-size: 40px;
+            color: #667eea;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .http-label {
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .frontend-layer {
+            background: linear-gradient(135deg, #e3f2fd 0%, #90caf9 100%);
+        }
+
+        .backend-layer {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffb74d 100%);
+        }
+
+        .ai-layer {
+            background: linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%);
+        }
+
+        .result-layer {
+            background: linear-gradient(135deg, #e8f5e9 0%, #66bb6a 100%);
+        }
+
+        .user-layer {
+            background: linear-gradient(135deg, #fce4ec 0%, #f48fb1 100%);
+        }
+
+        .process-step {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .process-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .time-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .total-time {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3c72;
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .endpoint-badge {
+            display: inline-block;
+            background: #2196f3;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 25px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+                flex-direction: column;
+            }
+
+            .content {
+                padding: 30px;
+            }
+
+            .layer-box {
+                padding: 20px;
+            }
+
+            .layer-title {
+                font-size: 18px;
+                flex-wrap: wrap;
+            }
+
+            .layer-item {
+                padding-left: 10px;
+                font-size: 14px;
+            }
+
+            .process-step {
+                padding: 12px 15px;
+            }
+
+            .process-number {
+                width: 25px;
+                height: 25px;
+                line-height: 25px;
+                font-size: 14px;
+            }
+
+            .endpoint-badge {
+                display: block;
+                margin-top: 8px;
+                margin-left: 0;
+            }
+
+            .back-button {
+                padding: 12px 25px;
+                font-size: 15px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .layer-box {
+                padding: 15px;
+            }
+
+            .layer-title {
+                font-size: 16px;
+            }
+
+            .layer-item {
+                font-size: 13px;
+            }
+
+            .arrow-down {
+                font-size: 30px;
+            }
+
+            .http-label {
+                font-size: 12px;
+            }
+
+            .process-step {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            .time-badge {
+                font-size: 11px;
+                padding: 3px 10px;
+            }
+
+            .total-time {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🔧</span>
+                TEKNİK MİMARİ - SİSTEM YAPISI
+            </h1>
+        </div>
+
+        <div class="content">
+            <div class="architecture-diagram">
+
+                <!-- User Layer -->
+                <div class="layer" style="animation-delay: 0s;">
+                    <div class="layer-box user-layer">
+                        <div class="layer-title">
+                            👤 KULLANICI (Web Tarayıcı)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow-down">↓</div>
+
+                <!-- Frontend Layer -->
+                <div class="layer" style="animation-delay: 0.1s;">
+                    <div class="layer-box frontend-layer">
+                        <div class="layer-title">
+                            💻 FRONTEND (Streamlit / React)
+                        </div>
+                        <div class="layer-content">
+                            <div class="layer-item">• Dosya yükleme interface</div>
+                            <div class="layer-item">• Form girişleri</div>
+                            <div class="layer-item">• Görselleştirme (grafikler, raporlar)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow-down">↓</div>
+                <div class="http-label">HTTP POST Request</div>
+
+                <!-- Backend Layer -->
+                <div class="layer" style="animation-delay: 0.2s;">
+                    <div class="layer-box backend-layer">
+                        <div class="layer-title">
+                            ⚙️ BACKEND API (FastAPI / Flask)
+                        </div>
+                        <div class="layer-content">
+                            <div class="layer-item">
+                                • Dosya yükleme endpoint
+                                <span class="endpoint-badge">/upload_mri</span>
+                            </div>
+                            <div class="layer-item">
+                                • Tahmin endpoint
+                                <span class="endpoint-badge">/predict</span>
+                            </div>
+                            <div class="layer-item">
+                                • Rapor oluşturma
+                                <span class="endpoint-badge">/generate_report</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow-down">↓</div>
+
+                <!-- AI Processing Layer -->
+                <div class="layer" style="animation-delay: 0.3s;">
+                    <div class="layer-box ai-layer">
+                        <div class="layer-title">
+                            🤖 AI İŞLEME KATMANI
+                        </div>
+                        <div class="layer-content">
+                            <div class="process-step">
+                                <span class="process-number">1</span>
+                                MR Ön İşleme
+                                <span class="time-badge">12 sn</span>
+                            </div>
+                            <div class="process-step">
+                                <span class="process-number">2</span>
+                                Segmentasyon (yoksa U-Net üret)
+                                <span class="time-badge">28 sn</span>
+                            </div>
+                            <div class="process-step">
+                                <span class="process-number">3</span>
+                                Radiomics Çıkarımı
+                                <span class="time-badge">18 sn</span>
+                            </div>
+                            <div class="process-step">
+                                <span class="process-number">4</span>
+                                CNN Özellik Çıkarımı
+                                <span class="time-badge">15 sn</span>
+                            </div>
+                            <div class="process-step">
+                                <span class="process-number">5</span>
+                                Moleküler Veri Encoding
+                                <span class="time-badge">1 sn</span>
+                            </div>
+                            <div class="process-step">
+                                <span class="process-number">6</span>
+                                Hibrid Model Tahmini
+                                <span class="time-badge">7 sn</span>
+                            </div>
+                            <div class="total-time">
+                                ⏱️ Toplam İşlem Süresi: ~81 saniye
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow-down">↓</div>
+
+                <!-- Result Layer -->
+                <div class="layer" style="animation-delay: 0.4s;">
+                    <div class="layer-box result-layer">
+                        <div class="layer-title">
+                            📊 SONUÇ ve RAPOR OLUŞTURMA
+                        </div>
+                        <div class="layer-content">
+                            <div class="layer-item">• TMZ Yanıt Olasılığı: 34.7%</div>
+                            <div class="layer-item">• Risk Sınıfı: Yüksek</div>
+                            <div class="layer-item">• Klinik Öneriler: Alternatif tedavi, yakın takip</div>
+                            <div class="layer-item">• PDF Rapor: Hasta dosyasına eklenebilir</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div style="text-align: center; margin-top: 50px;">
+                <a href="sayfa1.html" class="back-button">
+                    🏠 Ana Sayfaya Dön
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

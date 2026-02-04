@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasta Bilgileri ve Anamnez</title>
+    <script src="auth.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .header p {
+            font-size: 15px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.2);
+            height: 6px;
+            margin-top: 20px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 20%;
+            transition: width 0.3s;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            color: #1e3c72;
+            margin-bottom: 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .required {
+            color: #f44336;
+            margin-left: 4px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #f44336;
+        }
+
+        .error-message {
+            color: #f44336;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 25px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .radio-option label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: normal;
+        }
+
+        .char-counter {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 2px solid #e0e0e0;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 16px 35px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #d0d0d0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .progress-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #e0e0e0;
+        }
+
+        .progress-dot.active {
+            background: #667eea;
+            width: 30px;
+            border-radius: 6px;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 25px;
+            }
+
+            .section-title {
+                font-size: 20px;
+            }
+
+            .button-container {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .radio-group {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>
+                <span>🧠</span>
+                Glioblastom TMZ Yanıt Tahmin Sistemi
+            </h1>
+            <p>Adım 1/5: Hasta Bilgileri ve Klinik Anamnez</p>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section-title">
+                📋 HASTA BİLGİLERİ VE ANAMNEZ
+            </div>
+
+            <form id="patientForm">
+                <div class="form-group">
+                    <label for="patientId">
+                        Hasta Referans Numarası (ID)
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" id="patientId" placeholder="Örn: GBM-2024-001" required minlength="3">
+                    <div class="error-message" id="patientIdError">Lütfen en az 3 karakterli bir hasta ID giriniz</div>
+                    <div class="hint">Hasta dosya numarası veya benzersiz tanımlayıcı</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="age">
+                        Yaş
+                        <span class="required">*</span>
+                    </label>
+                    <input type="number" id="age" min="18" max="100" placeholder="18-100 arası" required>
+                    <div class="error-message" id="ageError">Lütfen 18-100 arası geçerli bir yaş giriniz</div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Cinsiyet
+                        <span class="required">*</span>
+                    </label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="male" name="gender" value="Erkek" required>
+                            <label for="male">Erkek</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="female" name="gender" value="Kadın">
+                            <label for="female">Kadın</label>
+                        </div>
+                    </div>
+                    <div class="error-message" id="genderError">Lütfen cinsiyet seçiniz</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="anamnez">
+                        Klinik Anamnez ve Hasta Öyküsü
+                        <span class="required">*</span>
+                    </label>
+                    <textarea id="anamnez"
+                        placeholder="Hastanın şikayetleri, semptomların başlangıcı, tanı süreci, önceki tedaviler, komorbidite durumu ve mevcut klinik durumu hakkında detaylı bilgi giriniz..."
+                        required minlength="50"></textarea>
+                    <div class="char-counter">
+                        <span id="charCount">0</span> / Minimum 50 karakter
+                    </div>
+                    <div class="error-message" id="anamnezError">Lütfen en az 50 karakterlik detaylı anamnez giriniz
+                    </div>
+                    <div class="hint">
+                        Bu bilgi analiz raporunda klinik özet olarak yer alacak ve tedavi kararlarına yardımcı
+                        olacaktır.
+                        Lütfen mümkün olduğunca detaylı bilgi giriniz.
+                    </div>
+                </div>
+
+                <div class="button-container">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'">
+                        <span>←</span>
+                        Ana Sayfa
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">
+                        İleri
+                        <span>→</span>
+                    </button>
+                </div>
+            </form>
+
+            <div class="progress-indicator">
+                <div class="progress-dot active"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+                <div class="progress-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Karakter sayacı
+        const anamnezField = document.getElementById('anamnez');
+        const charCount = document.getElementById('charCount');
+
+        anamnezField.addEventListener('input', function () {
+            charCount.textContent = this.value.length;
+
+            // Gerçek zamanlı validasyon
+            if (this.value.length >= 50) {
+                this.classList.remove('error');
+                document.getElementById('anamnezError').classList.remove('show');
+            }
+        });
+
+        // Form validasyonu
+        document.getElementById('patientForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            let isValid = true;
+
+            // Hasta ID kontrolü
+            const patientId = document.getElementById('patientId');
+            if (patientId.value.trim().length < 3) {
+                patientId.classList.add('error');
+                document.getElementById('patientIdError').classList.add('show');
+                isValid = false;
+            } else {
+                patientId.classList.remove('error');
+                document.getElementById('patientIdError').classList.remove('show');
+            }
+
+            // Yaş kontrolü
+            const age = document.getElementById('age');
+            const ageValue = parseInt(age.value);
+            if (!ageValue || ageValue < 18 || ageValue > 100) {
+                age.classList.add('error');
+                document.getElementById('ageError').classList.add('show');
+                isValid = false;
+            } else {
+                age.classList.remove('error');
+                document.getElementById('ageError').classList.remove('show');
+            }
+
+            // Cinsiyet kontrolü
+            const gender = document.querySelector('input[name="gender"]:checked');
+            if (!gender) {
+                document.getElementById('genderError').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('genderError').classList.remove('show');
+            }
+
+            // Anamnez kontrolü
+            const anamnez = document.getElementById('anamnez');
+            if (anamnez.value.trim().length < 50) {
+                anamnez.classList.add('error');
+                document.getElementById('anamnezError').classList.add('show');
+                isValid = false;
+            } else {
+                anamnez.classList.remove('error');
+                document.getElementById('anamnezError').classList.remove('show');
+            }
+
+            // Tüm alanlar geçerliyse kaydet ve ilerle
+            if (isValid) {
+                const patientData = {
+                    id: patientId.value.trim(),
+                    age: ageValue,
+                    gender: gender.value,
+                    anamnez: anamnez.value.trim(),
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem('patientData', JSON.stringify(patientData));
+                window.location.href = 'sayfa2.html';
+            } else {
+                // Hata varsa ilk hatalı alana scroll
+                const firstError = document.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+
+        // Sayfa yüklendiğinde mevcut verileri doldur
+        window.onload = () => {
+            const data = JSON.parse(localStorage.getItem('patientData') || '{}');
+            if (data.id) document.getElementById('patientId').value = data.id;
+            if (data.age) document.getElementById('age').value = data.age;
+            if (data.anamnez) {
+                document.getElementById('anamnez').value = data.anamnez;
+                charCount.textContent = data.anamnez.length;
+            }
+            if (data.gender) {
+                const radio = document.querySelector(`input[name="gender"][value="${data.gender}"]`);
+                if (radio) radio.checked = true;
+            }
+        };
+
+        // Gerçek zamanlı hata temizleme
+        document.querySelectorAll('input, textarea').forEach(field => {
+            field.addEventListener('input', function () {
+                if (this.classList.contains('error')) {
+                    this.classList.remove('error');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
